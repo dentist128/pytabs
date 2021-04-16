@@ -49,6 +49,10 @@ def createArgumentParser():
         "-t", "--spaces-to-tabs",
         action="store_true",
         help="Replace spaces with tabs.")
+    parser.add_argument("-e", "--extension",
+        type=str,
+        help="Change default extension (.py) to... (without dot!)",
+        default="py")
     parser.add_argument("filename", type=str)
 
     return parser
@@ -101,7 +105,7 @@ def parseFile(filename):
     return True
 
 
-def parseDir(dirname):
+def parseDir(dirname, extension):
     ''' replace spaces on files in directory '''
     for root, _, files in os.walk(dirname):
         # check parent directory for write rights
@@ -109,7 +113,7 @@ def parseDir(dirname):
             print("No rights for write on '%s'" % root)
         else:
             # filter files by *.py extension
-            for filename in [file for file in files if file.endswith('.py')]:
+            for filename in [file for file in files if file.endswith('.%s' % extension)]:
                 ''' parse file '''
                 if not parseFile(os.path.abspath('%s/%s' % (root, filename))):
                     return False
@@ -136,7 +140,7 @@ if __name__ == "__main__":
         if not os.path.isdir(paramspace.filename):
             print("'%s' not a directory." % paramspace.filename)
         else:
-            exit(not parseDir(paramspace.filename))
+            exit(not parseDir(paramspace.filename, paramspace.extension))
     else:
         if not os.path.isfile(paramspace.filename):
             print("'%s' not a regular file." % paramspace.filename)
